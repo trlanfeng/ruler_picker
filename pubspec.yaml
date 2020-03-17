@@ -1,8 +1,7 @@
 name: ruler_picker
-description: A new Flutter package project.
+description: This is a picker with ruler style for flutter.
 version: 0.0.1
-author:
-homepage:
+homepage: https://github.com/trlanfeng/ruler_picker
 
 environment:
   sdk: ">=2.1.0 <3.0.0"

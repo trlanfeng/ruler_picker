@@ -107,7 +107,7 @@ class _MyHomePageState extends State<MyHomePage> {
               child: CupertinoTextField(
                 controller: _textEditingController,
                 onChanged: (value) {
-                  _rulerPickerController.value = int.parse(value);
+                  // _rulerPickerController.value = int.parse(value);
                 },
               ),
             )

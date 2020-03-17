@@ -1,4 +1,6 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:ruler_picker/ruler_picker.dart';
 
 void main() => runApp(MyApp());
 
@@ -20,7 +22,7 @@ class MyApp extends StatelessWidget {
         // is not restarted.
         primarySwatch: Colors.blue,
       ),
-      home: MyHomePage(title: 'Flutter Demo Home Page'),
+      home: MyHomePage(title: 'Ruler Picker Demo'),
     );
   }
 }
@@ -44,17 +46,15 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+  RulerPickerController _rulerPickerController;
+  TextEditingController _textEditingController;
+  num showValue = 0;
 
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
+  @override
+  void initState() {
+    super.initState();
+    _rulerPickerController = RulerPickerController(value: 0);
+    _textEditingController = TextEditingController(text: '10');
   }
 
   @override
@@ -91,21 +91,29 @@ class _MyHomePageState extends State<MyHomePage> {
           // horizontal).
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Text(
-              'You have pushed the button this many times:',
+            RulerPicker(
+              controller: _rulerPickerController,
+              onValueChange: (value) {
+                setState(() {
+                  _textEditingController.text = value.toString();
+                });
+              },
+              width: 300,
+              height: 100,
             ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.display1,
-            ),
+            Container(
+              margin: EdgeInsets.only(top: 20),
+              width: 300,
+              child: CupertinoTextField(
+                controller: _textEditingController,
+                onChanged: (value) {
+                  _rulerPickerController.value = int.parse(value);
+                },
+              ),
+            )
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 }

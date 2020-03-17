@@ -6,10 +6,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
-class TrianglePainter extends CustomPainter {
+class _TrianglePainter extends CustomPainter {
   final double lineSize;
 
-  TrianglePainter({this.lineSize = 16});
+  _TrianglePainter({this.lineSize = 16});
   @override
   void paint(Canvas canvas, Size size) {
     Path path = Path();
@@ -29,10 +29,11 @@ class TrianglePainter extends CustomPainter {
   }
 }
 
-class RulerPickerController extends ValueNotifier<double> {
-  RulerPickerController({value = 0.0}) : super(value);
-  double get value => super.value;
-  set value(double newValue) {
+/// init value from controller
+class RulerPickerController extends ValueNotifier<num> {
+  RulerPickerController({num value = 0.0}) : super(value);
+  num get value => super.value;
+  set value(num newValue) {
     super.value = newValue;
   }
 }
@@ -45,14 +46,20 @@ typedef void ValueChangedCallback(num value);
 class RulerPicker extends StatefulWidget {
   final ValueChangedCallback onValueChange;
   final double width;
+  final double height;
+  final Color backgroundColor;
+  final Widget marker;
   double _value;
   int fractionDigits;
   RulerPickerController controller;
   RulerPicker({
     @required this.onValueChange,
     @required this.width,
+    @required this.height,
+    this.backgroundColor = Colors.white,
     this.fractionDigits = 0,
     this.controller,
+    this.marker,
   });
   @override
   State<StatefulWidget> createState() {
@@ -63,22 +70,23 @@ class RulerPicker extends StatefulWidget {
 // todo 实现 animateTo
 class RulerPickerState extends State<RulerPicker> {
   double lastOffset = 0;
-  bool isOnDrag = false;
   bool isPosFixed = false;
   String value;
   ScrollController scrollController;
 
-  Widget triangle() {
-    return SizedBox(
-      width: 16,
-      height: 16,
-      child: CustomPaint(
-        painter: TrianglePainter(),
-      ),
-    );
-  }
-
+  /// default mark
   Widget mark() {
+    /// default mark arrow
+    Widget triangle() {
+      return SizedBox(
+        width: 16,
+        height: 16,
+        child: CustomPaint(
+          painter: _TrianglePainter(),
+        ),
+      );
+    }
+
     return Container(
       child: SizedBox(
         width: 16,
@@ -101,18 +109,17 @@ class RulerPickerState extends State<RulerPicker> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: Color.fromARGB(255, 247, 248, 250),
+      width: widget.width,
+      height: widget.height,
+      color: widget.backgroundColor,
       child: Stack(
         children: <Widget>[
           Listener(
             onPointerDown: (event) {
-              isOnDrag = true;
               FocusScope.of(context).requestFocus(new FocusNode());
               isPosFixed = false;
             },
-            onPointerUp: (event) {
-              isOnDrag = false;
-            },
+            onPointerUp: (event) {},
             child: NotificationListener(
               onNotification: (scrollNotification) {
                 if (scrollNotification is ScrollStartNotification) {
@@ -120,10 +127,13 @@ class RulerPickerState extends State<RulerPicker> {
                 } else if (scrollNotification is ScrollEndNotification) {
                   if (!isPosFixed) {
                     isPosFixed = true;
-                    // fixPosition(scrollController.offset);
+                    fixPosition((scrollNotification.metrics.pixels / 10)
+                            .roundToDouble() *
+                        10);
                     scrollController.notifyListeners();
                   }
                 }
+                return true;
               },
               child: ListView.builder(
                 controller: scrollController,
@@ -174,7 +184,7 @@ class RulerPickerState extends State<RulerPicker> {
           ),
           Positioned(
             left: widget.width / 2 - 6,
-            child: mark(),
+            child: widget.marker ?? mark(),
           ),
         ],
       ),
@@ -186,11 +196,6 @@ class RulerPickerState extends State<RulerPicker> {
     super.initState();
     scrollController = ScrollController();
     scrollController.addListener(() {
-      if (!isOnDrag && (scrollController.offset - lastOffset).abs() < 1) {
-        fixPosition(scrollController.offset);
-        return;
-      }
-      lastOffset = scrollController.offset;
       setState(() {
         widget._value = double.parse((scrollController.offset / 10)
             .toStringAsFixed(widget.fractionDigits));
@@ -216,9 +221,12 @@ class RulerPickerState extends State<RulerPicker> {
     super.didUpdateWidget(oldWidget);
   }
 
+  /// 滑动后修正标记，使之对齐
   void fixPosition(double curPos) {
+    print('curPos: ${curPos}');
     double targetPos =
         double.parse(curPos.toStringAsFixed(widget.fractionDigits));
+    print('targetPos: ${targetPos}');
     if (targetPos < 0) targetPos = 0;
     // todo animateTo 异步操作
     scrollController.jumpTo(
@@ -228,11 +236,12 @@ class RulerPickerState extends State<RulerPicker> {
     );
   }
 
-  void setPositionByValue(double value) {
-    double targetPos = value * 10;
+  /// 根据数值设置标记位置
+  void setPositionByValue(num value) {
+    num targetPos = value * 10;
     if (targetPos < 0) targetPos = 0;
     scrollController.jumpTo(
-      targetPos,
+      targetPos.toDouble(),
       // duration: Duration(milliseconds: 500),
       // curve: Curves.easeOut,
     );

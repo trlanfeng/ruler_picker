@@ -6,6 +6,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
+/// a triangle painter
 class _TrianglePainter extends CustomPainter {
   final double lineSize;
 
@@ -29,7 +30,9 @@ class _TrianglePainter extends CustomPainter {
   }
 }
 
-/// init value from controller
+/// The controller for the ruler picker
+/// init the ruler value from the controller
+/// 用于 RulerPicker 的控制器，可以在构造函数里初始化默认值
 class RulerPickerController extends ValueNotifier<num> {
   RulerPickerController({num value = 0.0}) : super(value);
   num get value => super.value;
@@ -40,7 +43,7 @@ class RulerPickerController extends ValueNotifier<num> {
 
 typedef void ValueChangedCallback(num value);
 
-/// 标尺选择器
+/// RulerPicker 标尺选择器
 /// [width] 必须是具体的值，包括父级container的width，不能是 double.infinity，
 /// 可以传入MediaQuery.of(context).size.width
 class RulerPicker extends StatefulWidget {
@@ -48,8 +51,10 @@ class RulerPicker extends StatefulWidget {
   final double width;
   final double height;
   final Color backgroundColor;
+  /// the marker on the ruler, default is a arrow
   final Widget marker;
   double _value;
+  /// the fraction digits of the picker value
   int fractionDigits;
   RulerPickerController controller;
   RulerPicker({

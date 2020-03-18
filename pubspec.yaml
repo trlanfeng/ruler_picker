@@ -1,6 +1,6 @@
 name: ruler_picker
-description: This is a picker with ruler style for flutter.
-version: 0.0.1
+description: This is a picker with ruler style for flutter. Make select a number more easy. 这是一个标尺选择器，可以用来方便的选择一个数字。
+version: 0.1.0
 homepage: https://github.com/trlanfeng/ruler_picker
 
 environment:

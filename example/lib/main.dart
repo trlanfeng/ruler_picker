@@ -1,3 +1,5 @@
+// import 'dart:html';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:ruler_picker/ruler_picker.dart';
@@ -28,12 +30,12 @@ class _MyHomePageState extends State<MyHomePage> {
   RulerPickerController _rulerPickerController;
   TextEditingController _textEditingController;
   num showValue = 0;
-
+  int fractionDigits = 1;
   @override
   void initState() {
     super.initState();
     _rulerPickerController = RulerPickerController(value: 0);
-    _textEditingController = TextEditingController(text: '10');
+    _textEditingController = TextEditingController(text: '0');
   }
 
   @override
@@ -49,7 +51,9 @@ class _MyHomePageState extends State<MyHomePage> {
             // a ruler picker
             RulerPicker(
               controller: _rulerPickerController,
+              fractionDigits: fractionDigits,
               onValueChange: (value) {
+                print(value);
                 setState(() {
                   _textEditingController.text = value.toString();
                 });
@@ -64,7 +68,7 @@ class _MyHomePageState extends State<MyHomePage> {
               child: CupertinoTextField(
                 controller: _textEditingController,
                 onChanged: (value) {
-                  showValue = int.parse(value);
+                   showValue = num.parse(num.parse(value).toStringAsFixed(fractionDigits));
                 },
                 onEditingComplete: () {
                   _rulerPickerController.value = showValue;

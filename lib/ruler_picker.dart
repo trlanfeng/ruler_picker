@@ -127,9 +127,10 @@ class RulerPickerState extends State<RulerPicker> {
                 } else if (scrollNotification is ScrollEndNotification) {
                   if (!isPosFixed) {
                     isPosFixed = true;
-                    fixPosition((scrollNotification.metrics.pixels / 10)
-                            .roundToDouble() *
-                        10);
+                    // fixPosition((scrollNotification.metrics.pixels / 100)
+                    //         .roundToDouble() *
+                    //     100);
+                    fixPosition(scrollNotification.metrics.pixels.roundToDouble());
                     scrollController.notifyListeners();
                   }
                 }
